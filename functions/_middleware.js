@@ -1,7 +1,7 @@
-// URL sumber yang akan diproxy
+// Domain sumber yang diproxy
 const SOURCE_URL = "https://putar.in";
 
-// Script Histats yang akan diinject
+// Script Histats untuk inject
 const HISTATS_SCRIPT = `
 <script type="text/javascript">
   var _Hasync= _Hasync|| [];
@@ -21,12 +21,11 @@ const HISTATS_SCRIPT = `
 </noscript>
 `;
 
-// Fungsi utama
 export const onRequest = async (context) => {
   const url = new URL(context.request.url);
   const newUrl = new URL(url.pathname + url.search, SOURCE_URL);
 
-  // Teruskan request ke sumber
+  // Teruskan permintaan ke situs sumber
   const newRequest = new Request(newUrl, {
     method: context.request.method,
     headers: context.request.headers,
@@ -35,18 +34,23 @@ export const onRequest = async (context) => {
   });
 
   const response = await fetch(newRequest);
-
-  // Cek tipe konten
   const contentType = response.headers.get("content-type") || "";
 
+  // Modifikasi hanya untuk HTML
   if (contentType.includes("text/html")) {
     let body = await response.text();
 
+    // Ganti semua referensi domain asli menjadi domain Pages.dev
+    const pagesHost = url.host;
+    body = body.replace(new RegExp(SOURCE_URL, "g"), `https://${pagesHost}`);
+    body = body.replace(new RegExp(SOURCE_URL.replace("https://", ""), "g"), pagesHost);
+
+    // Replace teks sesuai permintaan
+    body = body.replace(/dramaboss/gi, "dramacina");
+    body = body.replace(/nonton movie/gi, "nonton film");
+
     // Inject Histats sebelum </body>
     body = body.replace("</body>", `${HISTATS_SCRIPT}</body>`);
-
-    // Replace teks: dramaboss → dramacina
-    body = body.replace(/layardrama21/gi, "layardramaxxi");
 
     return new Response(body, {
       status: response.status,
@@ -54,6 +58,6 @@ export const onRequest = async (context) => {
     });
   }
 
-  // Untuk non-HTML (CSS, JS, gambar, dll), kembalikan apa adanya
+  // Untuk selain HTML (gambar, CSS, JS), kembalikan tanpa modifikasi
   return response;
 };
