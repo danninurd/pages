@@ -1,31 +1,31 @@
-// Domain sumber yang diproxy
-const SOURCE_URL = "https://putar.in";
+const SOURCE_URL = "https://kissasian.cam";
 
-// Script Histats untuk inject
+// Histats Script
 const HISTATS_SCRIPT = `
-<script type="text/javascript">
-  var _Hasync= _Hasync|| [];
-  _Hasync.push(['Histats.start', '1,4583914,4,0,0,0,00010000']);
-  _Hasync.push(['Histats.fasi', '1']);
-  _Hasync.push(['Histats.track_hits', '']);
-  (function() {
-    var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
-    hs.src = ('//s10.histats.com/js15_as.js');
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
-  })();
-</script>
-<noscript>
-  <a href="/" target="_blank">
-    <img src="//sstatic1.histats.com/0.gif?4583914&101" alt="" border="0">
-  </a>
-</noscript>
+
+<script data-cfasync="false" type="text/javascript" src="//qgxbluhsgad.com/t/9/fret/meow4/1957953/ce2eea5a.js"></script>
+<script type='text/javascript' src='//alterassumeaggravate.com/c4/80/e6/c480e6a6cdf238ed31c2599d973604ff.js'></script>
+`;
+
+// Meta verification
+const META_VERIFICATION = `
+<meta name="google-site-verification" content="KODE_GOOGLE" />
+<meta name="msvalidate.01" content="KODE_BING" />
 `;
 
 export const onRequest = async (context) => {
   const url = new URL(context.request.url);
+
+  // Handler untuk IndexNow
+  if (url.pathname === "/5ad9f5a8d25e415ea2969ebba0f8e73b.txt") {
+    return new Response("5ad9f5a8d25e415ea2969ebba0f8e73b", {
+      status: 200,
+      headers: { "content-type": "text/plain" }
+    });
+  }
+
   const newUrl = new URL(url.pathname + url.search, SOURCE_URL);
 
-  // Teruskan permintaan ke situs sumber
   const newRequest = new Request(newUrl, {
     method: context.request.method,
     headers: context.request.headers,
@@ -36,20 +36,24 @@ export const onRequest = async (context) => {
   const response = await fetch(newRequest);
   const contentType = response.headers.get("content-type") || "";
 
-  // Modifikasi hanya untuk HTML
   if (contentType.includes("text/html")) {
     let body = await response.text();
 
-    // Ganti semua referensi domain asli menjadi domain Pages.dev
     const pagesHost = url.host;
     body = body.replace(new RegExp(SOURCE_URL, "g"), `https://${pagesHost}`);
     body = body.replace(new RegExp(SOURCE_URL.replace("https://", ""), "g"), pagesHost);
 
-    // Replace teks sesuai permintaan
-    body = body.replace(/dramaboss/gi, "dramacina");
+    // Replace teks
+    body = body.replace(/4391950/gi, "4391950");
     body = body.replace(/nonton movie/gi, "nonton film");
 
-    // Inject Histats sebelum </body>
+    // Hapus script iklan
+    body = body.replace(/\/\/zb\.rafikfangas\.com\/r6PjpcsgV5v\/jwQXR/gi, "");
+
+    // Inject meta verification di <head>
+    body = body.replace("</head>", `${META_VERIFICATION}</head>`);
+
+    // Inject Histats
     body = body.replace("</body>", `${HISTATS_SCRIPT}</body>`);
 
     return new Response(body, {
@@ -58,6 +62,5 @@ export const onRequest = async (context) => {
     });
   }
 
-  // Untuk selain HTML (gambar, CSS, JS), kembalikan tanpa modifikasi
   return response;
 };
