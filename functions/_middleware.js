@@ -44,7 +44,7 @@ export const onRequest = async (context) => {
     body = body.replace(new RegExp(SOURCE_URL.replace("https://", ""), "g"), pagesHost);
 
     // Replace teks
-    body = body.replace(/4391950/gi, "4391950");
+    body = body.replace(/4391950/gi, "4607884");
     body = body.replace(/nonton movie/gi, "nonton film");
 
     // Hapus script iklan
