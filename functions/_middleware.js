@@ -61,21 +61,24 @@ export const onRequest = async (context) => {
       headers: { "content-type": "text/html" }
     });
   }
-// XML / Sitemap Processing
-  if (contentType.includes("xml") || url.pathname.endsWith(".xml")) {
-    try {
-      let xml = await response.text();
+// XML / Sitemap Processing (versi aman untuk Yoast)
+if (url.pathname.endsWith(".xml")) {
+  try {
+    let xml = await response.text();
 
-      xml = xml.replace(new RegExp(SOURCE_URL, "g"), `https://${pagesHost}`);
-      xml = xml.replace(new RegExp(SOURCE_URL.replace("https://", ""), "g"), pagesHost);
+    // Ganti URL source dengan Pages host
+    const pagesHost = url.host;
+    xml = xml.split(SOURCE_URL).join(`https://${pagesHost}`);
+    xml = xml.split(SOURCE_URL.replace("https://", "")).join(pagesHost);
 
-      return new Response(xml, {
-        status: response.status,
-        headers: { "content-type": "application/xml" }
-      });
-    } catch (err) {
-      return new Response("Error parsing sitemap", { status: 500 });
-    }
+    return new Response(xml, {
+      status: response.status,
+      headers: { "content-type": "application/xml" }
+    });
+  } catch (err) {
+    return new Response("Gagal memproses sitemap", { status: 500 });
   }
+}
+
   return response;
 };
