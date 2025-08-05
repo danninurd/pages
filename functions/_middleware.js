@@ -61,6 +61,17 @@ export const onRequest = async (context) => {
       headers: { "content-type": "text/html" }
     });
   }
+   // Proses Sitemap (XML)
+  if (contentType.includes("application/xml") || contentType.includes("text/xml")) {
+    let xml = await response.text();
 
+    xml = xml.replace(new RegExp(SOURCE_URL, "g"), `https://${pagesHost}`);
+    xml = xml.replace(new RegExp(SOURCE_URL.replace("https://", ""), "g"), pagesHost);
+
+    return new Response(xml, {
+      status: response.status,
+      headers: { "content-type": "application/xml" }
+    });
+  }
   return response;
 };
